@@ -133,7 +133,7 @@ EVALDIR = $(APPLIBDIR)/Utilities/STM32_EVAL
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 ## Demo-Application:
-SRC = main.c stm32f10x_it.c hw_config.c
+SRC = main.c stm32f10x_it.c hw_config.c leds.c
 SRC += usb_desc.c usb_endp.c usb_istr.c usb_prop.c usb_pwr.c
 SRC += $(CMSISDEVDIR)/system_stm32f10x.c
 ## compiler-specific sources

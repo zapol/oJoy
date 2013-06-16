@@ -18,6 +18,7 @@
 #include "stm32f10x.h"
 #include "usb_lib.h"
 #include "usb_istr.h"
+#include "leds.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -36,73 +37,62 @@ uint8_t Receive_Buffer[2];
 *******************************************************************************/
 void EP1_OUT_Callback(void)
 {
-  BitAction Led_State;
+    BitAction Led_State;
 
-  /* Read recieved data (2 bytes) */
-  USB_SIL_Read(EP1_OUT, Receive_Buffer);
+    /* Read recieved data (2 bytes) */
+    USB_SIL_Read(EP1_OUT, Receive_Buffer);
 
-  if (Receive_Buffer[1] == 0)
-  {
-    Led_State = Bit_RESET;
-  }
-  else
-  {
-    Led_State = Bit_SET;
-  }
+    if (Receive_Buffer[1] == 0)
+    {
+        Led_State = Bit_RESET;
+    }
+    else
+    {
+        Led_State = Bit_SET;
+    }
 
 
-//  switch (Receive_Buffer[0])
-//  {
-//    case 1: /* Led 1 */
-//     if (Led_State != Bit_RESET)
-//     {
-//       STM_EVAL_LEDOn(LED1);
-//     }
-//     else
-//     {
-//       STM_EVAL_LEDOff(LED1);
-//     }
-//     break;
-//    case 2: /* Led 2 */
-//     if (Led_State != Bit_RESET)
-//     {
-//       STM_EVAL_LEDOn(LED2);
-//     }
-//     else
-//     {
-//       STM_EVAL_LEDOff(LED2);
-//     }
-//      break;
-//    case 3: /* Led 3 */
-//     if (Led_State != Bit_RESET)
-//     {
-//       STM_EVAL_LEDOn(LED3);
-//     }
-//     else
-//     {
-//       STM_EVAL_LEDOff(LED3);
-//     }
-//      break;
-//    case 4: /* Led 4 */
-//     if (Led_State != Bit_RESET)
-//     {
-//       STM_EVAL_LEDOn(LED4);
-//     }
-//     else
-//     {
-//       STM_EVAL_LEDOff(LED4);
-//     }
-//      break;
-//  default:
-//    STM_EVAL_LEDOff(LED1);
-//    STM_EVAL_LEDOff(LED2);
-//    STM_EVAL_LEDOff(LED3);
-//    STM_EVAL_LEDOff(LED4);
-//    break;
-//  }
+    switch (Receive_Buffer[0])
+    {
+    case 1: /* Led 1 */
+        if (Led_State != Bit_RESET)
+        {
+            ledOn(LED_R);
+        }
+        else
+        {
+            ledOff(LED_R);
+        }
+        break;
+    case 2: /* Led 2 */
+        if (Led_State != Bit_RESET)
+        {
+            ledOn(LED_G);
+        }
+        else
+        {
+            ledOff(LED_G);
+        }
+        break;
+    case 3: /* Led 3 */
+        if (Led_State != Bit_RESET)
+        {
+            ledOn(LED_B);
+        }
+        else
+        {
+            ledOff(LED_B);
+        }
+        break;
+    default:
+        ledOff(LED_R);
+        ledOff(LED_G);
+        ledOff(LED_B);
+        break;
+    }
 
 #ifndef STM32F10X_CL
-  SetEPRxStatus(ENDP1, EP_RX_VALID);
+    SetEPRxStatus(ENDP1, EP_RX_VALID);
 #endif /* STM32F10X_CL */
 
 }

@@ -20,6 +20,7 @@
 #include "usb_lib.h"
 #include "usb_desc.h"
 #include "usb_pwr.h"
+#include "leds.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -91,7 +92,7 @@ void Set_System(void)
     RCC_PLLConfig(RCC_PLLSource_PREDIV1, RCC_PLLMul_9);
 #else
     /* PLLCLK = 8MHz * 9 = 72 MHz */
-    RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_9);
+    RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
 #endif
 
     /* Enable PLL */
@@ -256,25 +257,16 @@ void USB_Interrupts_Config(void)
 *******************************************************************************/
 void USB_Cable_Config (FunctionalState NewState)
 {
-#ifdef USE_STM3210C_EVAL
   if (NewState != DISABLE)
   {
     USB_DevConnect();
+    ledOn(LED_B);
   }
   else
   {
     USB_DevDisconnect();
+    ledOff(LED_B);
   }
-#else /* USE_STM3210B_EVAL or USE_STM3210E_EVAL */
-  if (NewState != DISABLE)
-  {
-    GPIO_ResetBits(USB_DISCONNECT, USB_DISCONNECT_PIN);
-  }
-  else
-  {
-    GPIO_SetBits(USB_DISCONNECT, USB_DISCONNECT_PIN);
-  }
-#endif /* USE_STM3210C_EVAL */
 }
 
 /*******************************************************************************
@@ -291,13 +283,12 @@ void GPIO_Configuration(void)
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIO_DISCONNECT |
                          RCC_APB2Periph_GPIO_IOAIN , ENABLE);
 
-#ifndef USE_STM3210C_EVAL
   /* USB_DISCONNECT used as USB pull-up */
   GPIO_InitStructure.GPIO_Pin = USB_DISCONNECT_PIN;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_Init(USB_DISCONNECT, &GPIO_InitStructure);
-#endif /* USE_STM3210C_EVAL */
+  USB_DISCONNECT->BSRR = USB_DISCONNECT_PIN;
 
   /* Configure Potentiometer IO as analog input */
   GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN_PIN;

@@ -53,41 +53,6 @@
 			<Add option="-mcpu=arm7tdmi" />
 			<Add option="-T ld/target.ld" />
 		</Linker>
-		<Unit filename="Makefile" />
-		<Unit filename="hw_config.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="hw_config.h" />
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="platform_config.h" />
-		<Unit filename="stm32_flash.ld" />
-		<Unit filename="stm32f10x_conf.h" />
-		<Unit filename="stm32f10x_it.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="stm32f10x_it.h" />
-		<Unit filename="usb_conf.h" />
-		<Unit filename="usb_desc.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="usb_desc.h" />
-		<Unit filename="usb_endp.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="usb_istr.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="usb_istr.h" />
-		<Unit filename="usb_prop.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="usb_prop.h" />
-		<Unit filename="usb_pwr.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="usb_pwr.h" />
 		<Unit filename="../dokumenty/STM32/STM32F10x_StdPeriph_Lib_V3.5.0/Libraries/CMSIS/CM3/CoreSupport/core_cm3.c">
 			<Option compilerVar="CC" />
 			<Option virtualFolder="CMSIS/" />
@@ -348,6 +313,45 @@
 			<Option compilerVar="CC" />
 			<Option virtualFolder="USB/" />
 		</Unit>
+		<Unit filename="Makefile" />
+		<Unit filename="hw_config.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="hw_config.h" />
+		<Unit filename="leds.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="leds.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="platform_config.h" />
+		<Unit filename="stm32_flash.ld" />
+		<Unit filename="stm32f10x_conf.h" />
+		<Unit filename="stm32f10x_it.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="stm32f10x_it.h" />
+		<Unit filename="usb_conf.h" />
+		<Unit filename="usb_desc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="usb_desc.h" />
+		<Unit filename="usb_endp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="usb_istr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="usb_istr.h" />
+		<Unit filename="usb_prop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="usb_prop.h" />
+		<Unit filename="usb_pwr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="usb_pwr.h" />
 		<Extensions>
 			<code_completion />
 			<debugger>

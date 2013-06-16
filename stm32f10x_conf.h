@@ -22,7 +22,7 @@
 #include "stm32f10x_adc.h"
 /* #include "stm32f10x_bkp.h" */
 /* #include "stm32f10x_can.h" */
-/* #include "stm32f10x_crc.h" */
+#include "stm32f10x_crc.h"
 /* #include "stm32f10x_dac.h" */
 /* #include "stm32f10x_dbgmcu.h" */
 #include "stm32f10x_dma.h"
@@ -30,7 +30,7 @@
 #include "stm32f10x_flash.h"
 /* #include "stm32f10x_fsmc.h" */
 #include "stm32f10x_gpio.h"
-#include "stm32f10x_i2c.h"
+/* #include "stm32f10x_i2c.h" */
 /* #include "stm32f10x_iwdg.h" */
 /* #include "stm32f10x_pwr.h" */
 #include "stm32f10x_rcc.h"
@@ -44,7 +44,7 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-/* Uncomment the line below to expanse the "assert_param" macro in the 
+/* Uncomment the line below to expanse the "assert_param" macro in the
    Standard Peripheral Library drivers code */
 /* #define USE_FULL_ASSERT    1 */
 
@@ -56,10 +56,10 @@
 * Description    : The assert_param macro is used for function's parameters check.
 * Input          : - expr: If expr is false, it calls assert_failed function
 *                    which reports the name of the source file and the source
-*                    line number of the call that failed. 
+*                    line number of the call that failed.
 *                    If expr is true, it returns no value.
 * Return         : None
-*******************************************************************************/ 
+*******************************************************************************/
   #define assert_param(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
   void assert_failed(uint8_t* file, uint32_t line);

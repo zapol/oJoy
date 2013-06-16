@@ -21,11 +21,14 @@
 #define USB_DISCONNECT                      GPIOA
 #define USB_DISCONNECT_PIN                  GPIO_Pin_10
 #define RCC_APB2Periph_GPIO_DISCONNECT      RCC_APB2Periph_GPIOA
+#define USB_DevConnect()                    (USB_DISCONNECT->CRH &= ~(0x01<<6))
+#define USB_DevDisconnect()                 (USB_DISCONNECT->CRH |= 0x01<<6)
 
-#define RCC_APB2Periph_GPIO_IOAIN           RCC_APB2Periph_GPIOC
-#define GPIO_IOAIN                          GPIOC
-#define GPIO_IOAIN_PIN                      GPIO_Pin_4   /* PC.04 */
-#define ADC_AIN_CHANNEL                     ADC_Channel_14
+
+#define RCC_APB2Periph_GPIO_IOAIN           RCC_APB2Periph_GPIOA
+#define GPIO_IOAIN                          GPIOA
+#define GPIO_IOAIN_PIN                      GPIO_Pin_0   /* PC.04 */
+#define ADC_AIN_CHANNEL                     ADC_Channel_0
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

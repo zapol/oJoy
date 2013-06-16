@@ -17,6 +17,7 @@
 #include "stm32f10x.h"
 #include "usb_lib.h"
 #include "hw_config.h"
+#include "leds.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -25,6 +26,7 @@
 /* Extern variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 void Delay(__IO uint32_t nCount);
+extern __IO int sysTicks;
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -37,8 +39,9 @@ void Delay(__IO uint32_t nCount);
 *******************************************************************************/
 int main(void)
 {
-    volatile int i;
     Set_System();
+    SysTick_Config(SystemCoreClock/10);
+    ledsInit();
 
     USB_Interrupts_Config();
 
@@ -48,12 +51,8 @@ int main(void)
 
     while (1)
     {
-        i++;
-        asm("nop");
-        asm("nop");
-        asm("nop");
-        asm("nop");
-        asm("nop");
+        if(!(sysTicks%10)) ledOn(LED_R);
+        else ledOff(LED_R);
     }
 }
 

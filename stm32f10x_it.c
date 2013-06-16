@@ -26,7 +26,8 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-__IO uint8_t Send_Buffer[2];
+__IO uint16_t Send_Buffer[9];
+__IO int sysTicks=0;
 extern uint32_t ADC_ConvertedValueX;
 extern uint32_t ADC_ConvertedValueX_1;
 
@@ -150,6 +151,7 @@ void PendSV_Handler(void)
 *******************************************************************************/
 void SysTick_Handler(void)
 {
+    sysTicks++;
 }
 
 /******************************************************************************/
@@ -180,14 +182,21 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 *******************************************************************************/
 void DMA1_Channel1_IRQHandler(void)
 {
-  Send_Buffer[0] = 0x07;
+  Send_Buffer[0] = 0x01;
 
-  if((ADC_ConvertedValueX >>4) - (ADC_ConvertedValueX_1 >>4) > 4)
+  if((ADC_ConvertedValueX>>4) - (ADC_ConvertedValueX_1>>4) > 4)
   {
-    Send_Buffer[1] = (uint8_t)(ADC_ConvertedValueX >>4);
+    Send_Buffer[1] = (uint16_t)(ADC_ConvertedValueX);
+    Send_Buffer[2] = (uint16_t)(ADC_ConvertedValueX);
+    Send_Buffer[3] = (uint16_t)(ADC_ConvertedValueX);
+    Send_Buffer[4] = (uint16_t)(ADC_ConvertedValueX);
+    Send_Buffer[5] = (uint16_t)(ADC_ConvertedValueX);
+    Send_Buffer[6] = (uint16_t)(ADC_ConvertedValueX);
+    Send_Buffer[7] = (uint16_t)(ADC_ConvertedValueX);
+    Send_Buffer[8] = (uint16_t)(ADC_ConvertedValueX);
 
     /* Write the descriptor through the endpoint */
-    USB_SIL_Write(EP1_IN, (uint8_t*) Send_Buffer, 2);
+    USB_SIL_Write(EP1_IN, (uint8_t*) Send_Buffer, 9);
 
   #ifndef STM32F10X_CL
     SetEPTxValid(ENDP1);
