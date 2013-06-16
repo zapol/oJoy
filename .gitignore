@@ -19,3 +19,5 @@
 # Rest
 *.layout
 bin/
+descriptor_tool/
+*.desc

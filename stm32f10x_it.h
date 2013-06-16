@@ -43,6 +43,13 @@ void DMA1_Channel1_IRQHandler(void);
 void EXTI9_5_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
 
+typedef struct __attribute__((__packed__)){
+    uint16_t buttons;
+    int8_t x;
+    int8_t y;
+    int8_t z;
+} joyReport_t;
+
 #ifdef STM32F10X_CL
 void OTG_FS_IRQHandler(void);
 #endif /* STM32F10X_CL */

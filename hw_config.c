@@ -44,103 +44,104 @@ static void IntToUnicode (uint32_t value , uint8_t *pbuf , uint8_t len);
 *******************************************************************************/
 void Set_System(void)
 {
-  /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration -----------------------------*/
-  /* RCC system reset(for debug purpose) */
-  RCC_DeInit();
+    /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration -----------------------------*/
+    /* RCC system reset(for debug purpose) */
+    RCC_DeInit();
 
-  /* Enable HSE */
-  RCC_HSEConfig(RCC_HSE_ON);
+    /* Enable HSE */
+    RCC_HSEConfig(RCC_HSE_ON);
 
-  /* Wait till HSE is ready */
-  HSEStartUpStatus = RCC_WaitForHSEStartUp();
+    /* Wait till HSE is ready */
+    HSEStartUpStatus = RCC_WaitForHSEStartUp();
 
-  if (HSEStartUpStatus == SUCCESS)
-  {
-    /* Enable Prefetch Buffer */
-    FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
+    if (HSEStartUpStatus == SUCCESS)
+    {
+        /* Enable Prefetch Buffer */
+        FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
 
-    /* Flash 2 wait state */
-    FLASH_SetLatency(FLASH_Latency_2);
+        /* Flash 2 wait state */
+        FLASH_SetLatency(FLASH_Latency_2);
 
-    /* HCLK = SYSCLK */
-    RCC_HCLKConfig(RCC_SYSCLK_Div1);
+        /* HCLK = SYSCLK */
+        RCC_HCLKConfig(RCC_SYSCLK_Div1);
 
-    /* PCLK2 = HCLK */
-    RCC_PCLK2Config(RCC_HCLK_Div1);
+        /* PCLK2 = HCLK */
+        RCC_PCLK2Config(RCC_HCLK_Div1);
 
-    /* PCLK1 = HCLK/2 */
-    RCC_PCLK1Config(RCC_HCLK_Div2);
+        /* PCLK1 = HCLK/2 */
+        RCC_PCLK1Config(RCC_HCLK_Div2);
 
-    /* ADCCLK = PCLK2/8 */
-    RCC_ADCCLKConfig(RCC_PCLK2_Div8);
+        /* ADCCLK = PCLK2/8 */
+        RCC_ADCCLKConfig(RCC_PCLK2_Div8);
 
 #ifdef STM32F10X_CL
-    /* Configure PLLs *********************************************************/
-    /* PLL2 configuration: PLL2CLK = (HSE / 5) * 8 = 40 MHz */
-    RCC_PREDIV2Config(RCC_PREDIV2_Div5);
-    RCC_PLL2Config(RCC_PLL2Mul_8);
+        /* Configure PLLs *********************************************************/
+        /* PLL2 configuration: PLL2CLK = (HSE / 5) * 8 = 40 MHz */
+        RCC_PREDIV2Config(RCC_PREDIV2_Div5);
+        RCC_PLL2Config(RCC_PLL2Mul_8);
 
-    /* Enable PLL2 */
-    RCC_PLL2Cmd(ENABLE);
+        /* Enable PLL2 */
+        RCC_PLL2Cmd(ENABLE);
 
-    /* Wait till PLL2 is ready */
-    while (RCC_GetFlagStatus(RCC_FLAG_PLL2RDY) == RESET)
-    {}
+        /* Wait till PLL2 is ready */
+        while (RCC_GetFlagStatus(RCC_FLAG_PLL2RDY) == RESET)
+        {}
 
-    /* PLL configuration: PLLCLK = (PLL2 / 5) * 9 = 72 MHz */
-    RCC_PREDIV1Config(RCC_PREDIV1_Source_PLL2, RCC_PREDIV1_Div5);
-    RCC_PLLConfig(RCC_PLLSource_PREDIV1, RCC_PLLMul_9);
+        /* PLL configuration: PLLCLK = (PLL2 / 5) * 9 = 72 MHz */
+        RCC_PREDIV1Config(RCC_PREDIV1_Source_PLL2, RCC_PREDIV1_Div5);
+        RCC_PLLConfig(RCC_PLLSource_PREDIV1, RCC_PLLMul_9);
 #else
-    /* PLLCLK = 8MHz * 9 = 72 MHz */
-    RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
+        /* PLLCLK = 8MHz * 9 = 72 MHz */
+        RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
 #endif
 
-    /* Enable PLL */
-    RCC_PLLCmd(ENABLE);
+        /* Enable PLL */
+        RCC_PLLCmd(ENABLE);
 
-    /* Wait till PLL is ready */
-    while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET)
+        /* Wait till PLL is ready */
+        while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET)
+        {
+        }
+
+        /* Select PLL as system clock source */
+        RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
+
+        /* Wait till PLL is used as system clock source */
+        while(RCC_GetSYSCLKSource() != 0x08)
+        {
+        }
+    }
+    else
     {
+        /* If HSE fails to start-up, the application will have wrong clock configuration.
+           User can add here some code to deal with this error */
+
+        /* Go to infinite loop */
+        while (1)
+        {
+        }
     }
 
-    /* Select PLL as system clock source */
-    RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
+    /* Configure the used GPIOs*/
+    GPIO_Configuration();
 
-    /* Wait till PLL is used as system clock source */
-    while(RCC_GetSYSCLKSource() != 0x08)
-    {
-    }
-  }
-  else
-  { /* If HSE fails to start-up, the application will have wrong clock configuration.
-       User can add here some code to deal with this error */
-
-    /* Go to infinite loop */
-    while (1)
-    {
-    }
-  }
-
-  /* Configure the used GPIOs*/
-  GPIO_Configuration();
-
-  /* Configure the KEY button in EXTI mode */
+    /* Configure the KEY button in EXTI mode */
 //  STM_EVAL_PBInit(Button_KEY, Mode_EXTI);
 
-  /* Configure the Tamper button in EXTI mode */
+    /* Configure the Tamper button in EXTI mode */
 //  STM_EVAL_PBInit(Button_TAMPER, Mode_EXTI);
 
-  /* Additional EXTI configuration (configure both edges) */
-  EXTI_Configuration();
+    /* Additional EXTI configuration (configure both edges) */
+    EXTI_Configuration();
 
-  /* Configure the LEDs */
+    /* Configure the LEDs */
 //  STM_EVAL_LEDInit(LED1);
 //  STM_EVAL_LEDInit(LED2);
 //  STM_EVAL_LEDInit(LED3);
 //  STM_EVAL_LEDInit(LED4);
 
-  /* Configure the ADC*/
-  ADC_Configuration();
+    /* Configure the ADC*/
+    ADC_Configuration();
 }
 
 /*******************************************************************************
@@ -153,17 +154,17 @@ void Set_System(void)
 void Set_USBClock(void)
 {
 #ifdef STM32F10X_CL
-  /* Select USBCLK source */
-  RCC_OTGFSCLKConfig(RCC_OTGFSCLKSource_PLLVCO_Div3);
+    /* Select USBCLK source */
+    RCC_OTGFSCLKConfig(RCC_OTGFSCLKSource_PLLVCO_Div3);
 
-  /* Enable the USB clock */
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_OTG_FS, ENABLE) ;
+    /* Enable the USB clock */
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_OTG_FS, ENABLE) ;
 #else
-  /* Select USBCLK source */
-  RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);
+    /* Select USBCLK source */
+    RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);
 
-  /* Enable the USB clock */
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
+    /* Enable the USB clock */
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
 #endif /* STM32F10X_CL */
 }
 
@@ -176,8 +177,11 @@ void Set_USBClock(void)
 *******************************************************************************/
 void Enter_LowPowerMode(void)
 {
-  /* Set the device state to suspend */
-  bDeviceState = SUSPENDED;
+    /* Set the device state to suspend */
+    bDeviceState = SUSPENDED;
+    ledOff(LED_R);
+    ledOff(LED_G);
+    ledOff(LED_B);
 }
 
 /*******************************************************************************
@@ -189,18 +193,24 @@ void Enter_LowPowerMode(void)
 *******************************************************************************/
 void Leave_LowPowerMode(void)
 {
-  DEVICE_INFO *pInfo = &Device_Info;
+    DEVICE_INFO *pInfo = &Device_Info;
 
-  /* Set the device state to the correct state */
-  if (pInfo->Current_Configuration != 0)
-  {
-    /* Device configured */
-    bDeviceState = CONFIGURED;
-  }
-  else
-  {
-    bDeviceState = ATTACHED;
-  }
+    /* Set the device state to the correct state */
+    if (pInfo->Current_Configuration != 0)
+    {
+        /* Device configured */
+        bDeviceState = CONFIGURED;
+        ledOff(LED_R);
+        ledOff(LED_G);
+        ledOn(LED_B);
+    }
+    else
+    {
+        bDeviceState = ATTACHED;
+        ledOn(LED_R);
+        ledOff(LED_G);
+        ledOff(LED_B);
+    }
 }
 
 /*******************************************************************************
@@ -212,40 +222,40 @@ void Leave_LowPowerMode(void)
 *******************************************************************************/
 void USB_Interrupts_Config(void)
 {
-  NVIC_InitTypeDef NVIC_InitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
 
-  /* 2 bit for pre-emption priority, 2 bits for subpriority */
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    /* 2 bit for pre-emption priority, 2 bits for subpriority */
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 
 #ifdef STM32F10X_CL
-  /* Enable the USB Interrupts */
-  NVIC_InitStructure.NVIC_IRQChannel = OTG_FS_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+    /* Enable the USB Interrupts */
+    NVIC_InitStructure.NVIC_IRQChannel = OTG_FS_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
 #else
-  NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+    NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
 #endif /* STM32F10X_CL */
 
-  /* Enable the EXTI9_5 Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_Init(&NVIC_InitStructure);
+    /* Enable the EXTI9_5 Interrupt */
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_Init(&NVIC_InitStructure);
 
-  /* Enable the EXTI15_10 Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_Init(&NVIC_InitStructure);
+    /* Enable the EXTI15_10 Interrupt */
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_Init(&NVIC_InitStructure);
 
-  /* Enable the DMA1 Channel1 Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-  NVIC_Init(&NVIC_InitStructure);
+    /* Enable the DMA1 Channel1 Interrupt */
+    NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel1_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+    NVIC_Init(&NVIC_InitStructure);
 }
 
 /*******************************************************************************
@@ -257,16 +267,14 @@ void USB_Interrupts_Config(void)
 *******************************************************************************/
 void USB_Cable_Config (FunctionalState NewState)
 {
-  if (NewState != DISABLE)
-  {
-    USB_DevConnect();
-    ledOn(LED_B);
-  }
-  else
-  {
-    USB_DevDisconnect();
-    ledOff(LED_B);
-  }
+    if (NewState != DISABLE)
+    {
+        USB_DevConnect();
+    }
+    else
+    {
+        USB_DevDisconnect();
+    }
 }
 
 /*******************************************************************************
@@ -278,22 +286,22 @@ void USB_Cable_Config (FunctionalState NewState)
 *******************************************************************************/
 void GPIO_Configuration(void)
 {
-  GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitTypeDef GPIO_InitStructure;
 
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIO_DISCONNECT |
-                         RCC_APB2Periph_GPIO_IOAIN , ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIO_DISCONNECT |
+                           RCC_APB2Periph_GPIO_IOAIN , ENABLE);
 
-  /* USB_DISCONNECT used as USB pull-up */
-  GPIO_InitStructure.GPIO_Pin = USB_DISCONNECT_PIN;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-  GPIO_Init(USB_DISCONNECT, &GPIO_InitStructure);
-  USB_DISCONNECT->BSRR = USB_DISCONNECT_PIN;
+    /* USB_DISCONNECT used as USB pull-up */
+    GPIO_InitStructure.GPIO_Pin = USB_DISCONNECT_PIN;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(USB_DISCONNECT, &GPIO_InitStructure);
+    USB_DISCONNECT->BSRR = USB_DISCONNECT_PIN;
 
-  /* Configure Potentiometer IO as analog input */
-  GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN_PIN;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
-  GPIO_Init(GPIO_IOAIN, &GPIO_InitStructure);
+    /* Configure Potentiometer IO as analog input */
+    GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+    GPIO_Init(GPIO_IOAIN, &GPIO_InitStructure);
 }
 
 /*******************************************************************************
@@ -337,64 +345,64 @@ void EXTI_Configuration(void)
 *******************************************************************************/
 void ADC_Configuration(void)
 {
-  ADC_InitTypeDef ADC_InitStructure;
-  DMA_InitTypeDef DMA_InitStructure;
+    ADC_InitTypeDef ADC_InitStructure;
+    DMA_InitTypeDef DMA_InitStructure;
 
-  /* Enable DMA1 clock */
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+    /* Enable DMA1 clock */
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
-  /* Enable ADC1 clock */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+    /* Enable ADC1 clock */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
 
-  /* DMA1 channel1 configuration ---------------------------------------------*/
-  DMA_DeInit(DMA1_Channel1);
-  DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_Address;
-  DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&ADC_ConvertedValueX;
-  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-  DMA_InitStructure.DMA_BufferSize = 1;
-  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;
-  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-  DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
-  DMA_InitStructure.DMA_Priority = DMA_Priority_High;
-  DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
-  DMA_Init(DMA1_Channel1, &DMA_InitStructure);
+    /* DMA1 channel1 configuration ---------------------------------------------*/
+    DMA_DeInit(DMA1_Channel1);
+    DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_Address;
+    DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&ADC_ConvertedValueX;
+    DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
+    DMA_InitStructure.DMA_BufferSize = 1;
+    DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+    DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;
+    DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+    DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+    DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+    DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+    DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
+    DMA_Init(DMA1_Channel1, &DMA_InitStructure);
 
-  /* Enable DMA1 channel1 */
-  DMA_Cmd(DMA1_Channel1, ENABLE);
+    /* Enable DMA1 channel1 */
+    DMA_Cmd(DMA1_Channel1, ENABLE);
 
-  /* Enable the DMA1 Channel1 Transfer complete interrupt */
-  DMA_ITConfig(DMA1_Channel1, DMA_IT_TC, ENABLE);
+    /* Enable the DMA1 Channel1 Transfer complete interrupt */
+    DMA_ITConfig(DMA1_Channel1, DMA_IT_TC, ENABLE);
 
-  /* ADC1 configuration ------------------------------------------------------*/
-  ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
-  ADC_InitStructure.ADC_ScanConvMode = ENABLE;
-  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
-  ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
-  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-  ADC_InitStructure.ADC_NbrOfChannel = 1;
-  ADC_Init(ADC1, &ADC_InitStructure);
+    /* ADC1 configuration ------------------------------------------------------*/
+    ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
+    ADC_InitStructure.ADC_ScanConvMode = ENABLE;
+    ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+    ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
+    ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+    ADC_InitStructure.ADC_NbrOfChannel = 1;
+    ADC_Init(ADC1, &ADC_InitStructure);
 
-  /* ADC1 regular channel configuration */
-  ADC_RegularChannelConfig(ADC1, ADC_AIN_CHANNEL, 1, ADC_SampleTime_55Cycles5);
+    /* ADC1 regular channel configuration */
+    ADC_RegularChannelConfig(ADC1, ADC_AIN_CHANNEL, 1, ADC_SampleTime_55Cycles5);
 
-  /* Enable ADC1 DMA */
-  ADC_DMACmd(ADC1, ENABLE);
+    /* Enable ADC1 DMA */
+    ADC_DMACmd(ADC1, ENABLE);
 
-  /* Enable ADC1 */
-  ADC_Cmd(ADC1, ENABLE);
+    /* Enable ADC1 */
+    ADC_Cmd(ADC1, ENABLE);
 
-  /* Enable ADC1 reset calibaration register */
-  ADC_ResetCalibration(ADC1);
-  /* Check the end of ADC1 reset calibration register */
-  while(ADC_GetResetCalibrationStatus(ADC1));
+    /* Enable ADC1 reset calibaration register */
+    ADC_ResetCalibration(ADC1);
+    /* Check the end of ADC1 reset calibration register */
+    while(ADC_GetResetCalibrationStatus(ADC1));
 
-  /* Start ADC1 calibaration */
-  ADC_StartCalibration(ADC1);
+    /* Start ADC1 calibaration */
+    ADC_StartCalibration(ADC1);
 
-  /* Check the end of ADC1 calibration */
-  while(ADC_GetCalibrationStatus(ADC1));
+    /* Check the end of ADC1 calibration */
+    while(ADC_GetCalibrationStatus(ADC1));
 }
 
 /*******************************************************************************
@@ -406,19 +414,19 @@ void ADC_Configuration(void)
 *******************************************************************************/
 void Get_SerialNum(void)
 {
-  uint32_t Device_Serial0, Device_Serial1, Device_Serial2;
+    uint32_t Device_Serial0, Device_Serial1, Device_Serial2;
 
-  Device_Serial0 = *(__IO uint32_t*)(0x1FFFF7E8);
-  Device_Serial1 = *(__IO uint32_t*)(0x1FFFF7EC);
-  Device_Serial2 = *(__IO uint32_t*)(0x1FFFF7F0);
+    Device_Serial0 = *(__IO uint32_t*)(0x1FFFF7E8);
+    Device_Serial1 = *(__IO uint32_t*)(0x1FFFF7EC);
+    Device_Serial2 = *(__IO uint32_t*)(0x1FFFF7F0);
 
-  Device_Serial0 += Device_Serial2;
+    Device_Serial0 += Device_Serial2;
 
-  if (Device_Serial0 != 0)
-  {
-    IntToUnicode (Device_Serial0, &CustomHID_StringSerial[2] , 8);
-    IntToUnicode (Device_Serial1, &CustomHID_StringSerial[18], 4);
-  }
+    if (Device_Serial0 != 0)
+    {
+        IntToUnicode (Device_Serial0, &CustomHID_StringSerial[2] , 8);
+        IntToUnicode (Device_Serial1, &CustomHID_StringSerial[18], 4);
+    }
 }
 
 /*******************************************************************************
@@ -430,23 +438,23 @@ void Get_SerialNum(void)
 *******************************************************************************/
 static void IntToUnicode (uint32_t value , uint8_t *pbuf , uint8_t len)
 {
-  uint8_t idx = 0;
+    uint8_t idx = 0;
 
-  for( idx = 0 ; idx < len ; idx ++)
-  {
-    if( ((value >> 28)) < 0xA )
+    for( idx = 0 ; idx < len ; idx ++)
     {
-      pbuf[ 2* idx] = (value >> 28) + '0';
-    }
-    else
-    {
-      pbuf[2* idx] = (value >> 28) + 'A' - 10;
-    }
+        if( ((value >> 28)) < 0xA )
+        {
+            pbuf[ 2* idx] = (value >> 28) + '0';
+        }
+        else
+        {
+            pbuf[2* idx] = (value >> 28) + 'A' - 10;
+        }
 
-    value = value << 4;
+        value = value << 4;
 
-    pbuf[ 2* idx + 1] = 0;
-  }
+        pbuf[ 2* idx + 1] = 0;
+    }
 }
 #ifdef STM32F10X_CL
 /*******************************************************************************
@@ -458,18 +466,18 @@ static void IntToUnicode (uint32_t value , uint8_t *pbuf , uint8_t len)
 *******************************************************************************/
 void USB_OTG_BSP_uDelay (const uint32_t usec)
 {
-  RCC_ClocksTypeDef  RCC_Clocks;
+    RCC_ClocksTypeDef  RCC_Clocks;
 
-  /* Configure HCLK clock as SysTick clock source */
-  SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
+    /* Configure HCLK clock as SysTick clock source */
+    SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
 
-  RCC_GetClocksFreq(&RCC_Clocks);
+    RCC_GetClocksFreq(&RCC_Clocks);
 
-  SysTick_Config(usec * (RCC_Clocks.HCLK_Frequency / 1000000));
+    SysTick_Config(usec * (RCC_Clocks.HCLK_Frequency / 1000000));
 
-  SysTick->CTRL  &= ~SysTick_CTRL_TICKINT_Msk ;
+    SysTick->CTRL  &= ~SysTick_CTRL_TICKINT_Msk ;
 
-  while (!(SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk));
+    while (!(SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk));
 }
 #endif
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

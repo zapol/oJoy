@@ -26,10 +26,12 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+
 __IO uint16_t Send_Buffer[9];
 __IO int sysTicks=0;
 extern uint32_t ADC_ConvertedValueX;
 extern uint32_t ADC_ConvertedValueX_1;
+joyReport_t joyReport;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -58,10 +60,10 @@ void NMI_Handler(void)
 *******************************************************************************/
 void HardFault_Handler(void)
 {
-  /* Go to infinite loop when Hard Fault exception occurs */
-  while (1)
-  {
-  }
+    /* Go to infinite loop when Hard Fault exception occurs */
+    while (1)
+    {
+    }
 }
 
 /*******************************************************************************
@@ -73,10 +75,10 @@ void HardFault_Handler(void)
 *******************************************************************************/
 void MemManage_Handler(void)
 {
-  /* Go to infinite loop when Memory Manage exception occurs */
-  while (1)
-  {
-  }
+    /* Go to infinite loop when Memory Manage exception occurs */
+    while (1)
+    {
+    }
 }
 
 /*******************************************************************************
@@ -88,10 +90,10 @@ void MemManage_Handler(void)
 *******************************************************************************/
 void BusFault_Handler(void)
 {
-  /* Go to infinite loop when Bus Fault exception occurs */
-  while (1)
-  {
-  }
+    /* Go to infinite loop when Bus Fault exception occurs */
+    while (1)
+    {
+    }
 }
 
 /*******************************************************************************
@@ -103,10 +105,10 @@ void BusFault_Handler(void)
 *******************************************************************************/
 void UsageFault_Handler(void)
 {
-  /* Go to infinite loop when Usage Fault exception occurs */
-  while (1)
-  {
-  }
+    /* Go to infinite loop when Usage Fault exception occurs */
+    while (1)
+    {
+    }
 }
 
 /*******************************************************************************
@@ -169,7 +171,7 @@ void SysTick_Handler(void)
 *******************************************************************************/
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
-  USB_Istr();
+    USB_Istr();
 }
 #endif /* STM32F10X_CL */
 
@@ -182,30 +184,22 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 *******************************************************************************/
 void DMA1_Channel1_IRQHandler(void)
 {
-  Send_Buffer[0] = 0x01;
+    volatile int x;
+    x = sizeof(joyReport);
+    if((ADC_ConvertedValueX>>4) - (ADC_ConvertedValueX_1>>4) > 4)
+    {
+        joyReport.x = (int8_t)(ADC_ConvertedValueX>>4);
+        joyReport.y = (int8_t)(ADC_ConvertedValueX>>4);
+        joyReport.z = (int8_t)(ADC_ConvertedValueX>>4);
+        joyReport.buttons = (uint16_t)(ADC_ConvertedValueX&0xffff);
 
-  if((ADC_ConvertedValueX>>4) - (ADC_ConvertedValueX_1>>4) > 4)
-  {
-    Send_Buffer[1] = (uint16_t)(ADC_ConvertedValueX);
-    Send_Buffer[2] = (uint16_t)(ADC_ConvertedValueX);
-    Send_Buffer[3] = (uint16_t)(ADC_ConvertedValueX);
-    Send_Buffer[4] = (uint16_t)(ADC_ConvertedValueX);
-    Send_Buffer[5] = (uint16_t)(ADC_ConvertedValueX);
-    Send_Buffer[6] = (uint16_t)(ADC_ConvertedValueX);
-    Send_Buffer[7] = (uint16_t)(ADC_ConvertedValueX);
-    Send_Buffer[8] = (uint16_t)(ADC_ConvertedValueX);
+        /* Write the descriptor through the endpoint */
+        USB_SIL_Write(EP1_IN, (uint8_t*) &joyReport, sizeof(joyReport));
+        SetEPTxValid(ENDP1);
+        ADC_ConvertedValueX_1 = ADC_ConvertedValueX;
+    }
 
-    /* Write the descriptor through the endpoint */
-    USB_SIL_Write(EP1_IN, (uint8_t*) Send_Buffer, 9);
-
-  #ifndef STM32F10X_CL
-    SetEPTxValid(ENDP1);
-  #endif /* STM32F10X_CL */
-
-    ADC_ConvertedValueX_1 = ADC_ConvertedValueX;
-  }
-
-  DMA_ClearFlag(DMA1_FLAG_TC1);
+    DMA_ClearFlag(DMA1_FLAG_TC1);
 }
 
 /*******************************************************************************
@@ -286,7 +280,7 @@ void EXTI15_10_IRQHandler(void)
 *******************************************************************************/
 void OTG_FS_IRQHandler(void)
 {
-  STM32_PCD_OTG_ISR_Handler();
+    STM32_PCD_OTG_ISR_Handler();
 }
 #endif /* STM32F10X_CL */
 

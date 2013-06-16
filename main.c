@@ -51,8 +51,6 @@ int main(void)
 
     while (1)
     {
-        if(!(sysTicks%10)) ledOn(LED_R);
-        else ledOff(LED_R);
     }
 }
 

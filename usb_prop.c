@@ -21,6 +21,7 @@
 #include "usb_desc.h"
 #include "usb_pwr.h"
 #include "hw_config.h"
+#include "leds.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -113,10 +114,10 @@ ONE_DESCRIPTOR String_Descriptor[4] =
 *******************************************************************************/
 void CustomHID_init(void)
 {
-  /* Update the serial number string descriptor with the data from the unique 
+  /* Update the serial number string descriptor with the data from the unique
   ID*/
   Get_SerialNum();
-    
+
   pInformation->Current_Configuration = 0;
   /* Connect the device */
   PowerOn();
@@ -125,6 +126,9 @@ void CustomHID_init(void)
   USB_SIL_Init();
 
   bDeviceState = UNCONNECTED;
+  ledOff(LED_R);
+  ledOff(LED_G);
+  ledOff(LED_B);
 }
 
 /*******************************************************************************
@@ -139,19 +143,19 @@ void CustomHID_Reset(void)
   /* Set Joystick_DEVICE as not configured */
   pInformation->Current_Configuration = 0;
   pInformation->Current_Interface = 0;/*the default Interface*/
-  
+
   /* Current Feature initialization */
   pInformation->Current_Feature = CustomHID_ConfigDescriptor[7];
-  
-#ifdef STM32F10X_CL   
+
+#ifdef STM32F10X_CL
   /* EP0 is already configured in DFU_Init() by USB_SIL_Init() function */
-  
+
   /* Init EP1 IN as Interrupt endpoint */
   OTG_DEV_EP_Init(EP1_IN, OTG_DEV_EP_TYPE_INT, 2);
-  
+
   /* Init EP1 OUT as Interrupt endpoint */
   OTG_DEV_EP_Init(EP1_OUT, OTG_DEV_EP_TYPE_INT, 2);
-#else 
+#else
   SetBTABLE(BTABLE_ADDRESS);
 
   /* Initialize Endpoint 0 */
@@ -166,10 +170,10 @@ void CustomHID_Reset(void)
   /* Initialize Endpoint 1 */
   SetEPType(ENDP1, EP_INTERRUPT);
   SetEPTxAddr(ENDP1, ENDP1_TXADDR);
-  SetEPRxAddr(ENDP1, ENDP1_RXADDR);
-  SetEPTxCount(ENDP1, 2);
-  SetEPRxCount(ENDP1, 2);
-  SetEPRxStatus(ENDP1, EP_RX_VALID);
+//  SetEPRxAddr(ENDP1, ENDP1_RXADDR);
+  SetEPTxCount(ENDP1, 5);
+//  SetEPRxCount(ENDP1, 0);
+  SetEPRxStatus(ENDP1, EP_RX_DIS);
   SetEPTxStatus(ENDP1, EP_TX_NAK);
 
   /* Set this device to response on default address */
@@ -177,10 +181,13 @@ void CustomHID_Reset(void)
 #endif /* STM32F10X_CL */
 
   bDeviceState = ATTACHED;
+  ledOn(LED_R);
+  ledOff(LED_G);
+  ledOff(LED_B);
 }
 /*******************************************************************************
 * Function Name  : CustomHID_SetConfiguration.
-* Description    : Udpade the device state to configured and command the ADC 
+* Description    : Udpade the device state to configured and command the ADC
 *                  conversion.
 * Input          : None.
 * Output         : None.
@@ -192,8 +199,11 @@ void CustomHID_SetConfiguration(void)
   {
     /* Device configured */
     bDeviceState = CONFIGURED;
-    
-    /* Start ADC1 Software Conversion */ 
+    ledOff(LED_R);
+    ledOff(LED_G);
+    ledOn(LED_B);
+
+    /* Start ADC1 Software Conversion */
     ADC_SoftwareStartConvCmd(ADC1, ENABLE);
   }
 }
@@ -207,6 +217,9 @@ void CustomHID_SetConfiguration(void)
 void CustomHID_SetDeviceAddress (void)
 {
   bDeviceState = ADDRESSED;
+  ledOff(LED_R);
+  ledOn(LED_G);
+  ledOff(LED_B);
 }
 /*******************************************************************************
 * Function Name  : CustomHID_Status_In.
@@ -336,7 +349,7 @@ uint8_t *CustomHID_GetStringDescriptor(uint16_t Length)
   {
     return NULL;
   }
-  else 
+  else
   {
     return Standard_GetDescriptorData(Length, &String_Descriptor[wValue0]);
   }
