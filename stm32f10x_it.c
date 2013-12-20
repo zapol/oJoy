@@ -29,8 +29,7 @@
 
 __IO uint16_t Send_Buffer[9];
 __IO int sysTicks=0;
-extern uint32_t ADC_ConvertedValueX;
-extern uint32_t ADC_ConvertedValueX_1;
+extern uint32_t ADC_ConvertedValue[2];
 joyReport_t joyReport;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -184,20 +183,21 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 *******************************************************************************/
 void DMA1_Channel1_IRQHandler(void)
 {
-    volatile int x;
-    x = sizeof(joyReport);
-    if((ADC_ConvertedValueX>>4) - (ADC_ConvertedValueX_1>>4) > 4)
-    {
-        joyReport.x = (int8_t)(ADC_ConvertedValueX>>4);
-        joyReport.y = (int8_t)(ADC_ConvertedValueX>>4);
-        joyReport.z = (int8_t)(ADC_ConvertedValueX>>4);
-        joyReport.buttons = (uint16_t)(ADC_ConvertedValueX&0xffff);
+    float rudder;
+    joyReport.x = (int8_t)(-ADC_ConvertedValue[0]>>4)+128;
+    joyReport.y = (int8_t)(-ADC_ConvertedValue[1]>>4)+128;
+    rudder = ((float)ADC_ConvertedValue[3]-2048.0) * 0.3;
+    if(rudder>127.0) rudder = 127.0;
+    if(rudder<-127.0) rudder = -127.0;
+    joyReport.z = (int8_t)rudder;
+    joyReport.throttle1 = ((int8_t)(ADC_ConvertedValue[2]>>3)-138);
+    joyReport.throttle1 *= -1;
+    joyReport.throttle2 = ((int8_t)((4096-ADC_ConvertedValue[5])>>3)-84);
+    joyReport.throttle2 *= -1;
 
-        /* Write the descriptor through the endpoint */
-        USB_SIL_Write(EP1_IN, (uint8_t*) &joyReport, sizeof(joyReport));
-        SetEPTxValid(ENDP1);
-        ADC_ConvertedValueX_1 = ADC_ConvertedValueX;
-    }
+    /* Write the descriptor through the endpoint */
+    USB_SIL_Write(EP1_IN, (uint8_t*) &joyReport, sizeof(joyReport));
+    SetEPTxValid(ENDP1);
 
     DMA_ClearFlag(DMA1_FLAG_TC1);
 }

@@ -75,7 +75,7 @@ const uint8_t CustomHID_ConfigDescriptor[CUSTOMHID_SIZ_CONFIG_DESC] =
     USB_INTERFACE_DESCRIPTOR_TYPE,/* bDescriptorType: Interface descriptor type */
     0x00,         /* bInterfaceNumber: Number of Interface */
     0x00,         /* bAlternateSetting: Alternate setting */
-    0x02,         /* bNumEndpoints */
+    0x01,         /* bNumEndpoints */
     0x03,         /* bInterfaceClass: HID */
     0x00,         /* bInterfaceSubClass : 1=BOOT, 0=no boot */
     0x00,         /* nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse */
@@ -98,9 +98,9 @@ const uint8_t CustomHID_ConfigDescriptor[CUSTOMHID_SIZ_CONFIG_DESC] =
 
     0x81,          /* bEndpointAddress: Endpoint Address (IN) */
     0x03,          /* bmAttributes: Interrupt endpoint */
-    0x08,          /* wMaxPacketSize: 8 Bytes max */
+    0x05,          /* wMaxPacketSize: 16 Bytes max */
     0x00,
-    0x20,          /* bInterval: Polling Interval (32 ms) */
+    0x10,          /* bInterval: Polling Interval (32 ms) */
     /* 34 */
 
 //    0x07,	/* bLength: Endpoint Descriptor size */
@@ -120,25 +120,40 @@ const uint8_t CustomHID_ReportDescriptor[CUSTOMHID_SIZ_REPORT_DESC] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x04,                    // USAGE (Joystick)
     0xa1, 0x01,                    // COLLECTION (Application)
+    0x05, 0x01,                    //   USAGE_PAGE (Generic Desktop)
+    0x09, 0x01,                    //   USAGE (Pointer)
+    0x25, 0x7f,                    //   LOGICAL_MAXIMUM (127)
+    0x15, 0x81,                    //   LOGICAL_MINIMUM (-127)
     0xa1, 0x00,                    //   COLLECTION (Physical)
-    0x05, 0x09,                    //     USAGE_PAGE (Button)
-    0x19, 0x01,                    //     USAGE_MINIMUM (Button 1)
-    0x29, 0x10,                    //     USAGE_MAXIMUM (Button 16)
-    0x15, 0x00,                    //     LOGICAL_MINIMUM (0)
-    0x25, 0x01,                    //     LOGICAL_MAXIMUM (1)
-    0x95, 0x10,                    //     REPORT_COUNT (16)
-    0x75, 0x01,                    //     REPORT_SIZE (1)
-    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-    0x05, 0x01,                    //     USAGE_PAGE (Generic Desktop)
     0x09, 0x30,                    //     USAGE (X)
     0x09, 0x31,                    //     USAGE (Y)
-    0x09, 0x32,                    //     USAGE (Z)
-    0x15, 0x81,                    //     LOGICAL_MINIMUM (-127)
-    0x25, 0x7f,                    //     LOGICAL_MAXIMUM (127)
     0x75, 0x08,                    //     REPORT_SIZE (8)
-    0x95, 0x03,                    //     REPORT_COUNT (3)
+    0x95, 0x02,                    //     REPORT_COUNT (2)
     0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-    0xc0,                          //     END_COLLECTION
+    0xc0,                          //   END_COLLECTION
+    0x05, 0x02,                    //   USAGE_PAGE (Simulation Controls)
+    0x09, 0xba,                    //   USAGE (Rudder)
+    0x75, 0x08,                    //   REPORT_SIZE (8)
+    0x95, 0x01,                    //   REPORT_COUNT (1)
+    0x81, 0x02,                    //   INPUT (Data,Var,Abs)
+    0x05, 0x0a,                    //   USAGE_PAGE (Ordinals)
+    0x09, 0x01,                    //   USAGE (Instance 1)
+    0xa1, 0x00,                    //   COLLECTION (Physical)
+    0x05, 0x02,                    //     USAGE_PAGE (Simulation Controls)
+    0x09, 0xbb,                    //     USAGE (Throttle 1)
+    0x75, 0x08,                    //   REPORT_SIZE (8)
+    0x95, 0x01,                    //     REPORT_COUNT (1)
+    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+    0xc0,                          //   END_COLLECTION
+    0x05, 0x0a,                    //   USAGE_PAGE (Ordinals)
+    0x09, 0x02,                    //   USAGE (Instance 2)
+    0xa1, 0x00,                    //   COLLECTION (Physical)
+    0x05, 0x02,                    //     USAGE_PAGE (Simulation Controls)
+    0x09, 0xbb,                    //     USAGE (Throttle 2)
+    0x75, 0x08,                    //   REPORT_SIZE (8)
+    0x95, 0x01,                    //     REPORT_COUNT (1)
+    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+    0xc0,                          //   END_COLLECTION
     0xc0                           // END_COLLECTION
 };
 
@@ -284,9 +299,9 @@ const uint8_t CustomHID_StringProduct[CUSTOMHID_SIZ_STRING_PRODUCT] =
   {
     CUSTOMHID_SIZ_STRING_PRODUCT,          /* bLength */
     USB_STRING_DESCRIPTOR_TYPE,        /* bDescriptorType */
-    'S', 0, 'T', 0, 'M', 0, '3', 0, '2', 0, ' ', 0, 'C', 0,
-    'u', 0, 's', 0, 't', 0, 'm', 0, ' ', 0, 'H', 0, 'I', 0,
-    'D', 0
+    'Z', 0, 'a', 0, 'p', 0, 'o', 0, 'l', 0, '\'', 0, 's', 0,
+    ' ', 0, 's', 0, 't', 0, 'i', 0, 'c', 0, 'k', 0, ' ', 0,
+    'o', 0, 'f', 0, ' ', 0, 'j', 0, 'o', 0, 'y', 0
   };
 uint8_t CustomHID_StringSerial[CUSTOMHID_SIZ_STRING_SERIAL] =
   {

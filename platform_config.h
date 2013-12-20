@@ -26,8 +26,18 @@
 
 
 #define RCC_APB2Periph_GPIO_IOAIN           RCC_APB2Periph_GPIOA
-#define GPIO_IOAIN                          GPIOA
-#define GPIO_IOAIN_PIN                      GPIO_Pin_0   /* PC.04 */
+#define GPIO_IOAIN0                          GPIOA
+#define GPIO_IOAIN0_PIN                      GPIO_Pin_0   /* PC.04 */
+#define GPIO_IOAIN1                          GPIOA
+#define GPIO_IOAIN1_PIN                      GPIO_Pin_1   /* PC.04 */
+#define GPIO_IOAIN2                          GPIOA
+#define GPIO_IOAIN2_PIN                      GPIO_Pin_2   /* PC.04 */
+#define GPIO_IOAIN3                          GPIOA
+#define GPIO_IOAIN3_PIN                      GPIO_Pin_3   /* PC.04 */
+#define GPIO_IOAIN4                          GPIOA
+#define GPIO_IOAIN4_PIN                      GPIO_Pin_4   /* PC.04 */
+#define GPIO_IOAIN5                          GPIOA
+#define GPIO_IOAIN5_PIN                      GPIO_Pin_5   /* PC.04 */
 #define ADC_AIN_CHANNEL                     ADC_Channel_0
 
 /* Exported macro ------------------------------------------------------------*/

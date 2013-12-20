@@ -28,8 +28,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 ErrorStatus HSEStartUpStatus;
-uint32_t ADC_ConvertedValueX = 0;
-uint32_t ADC_ConvertedValueX_1 = 0;
+uint32_t ADC_ConvertedValue[4];
 
 /* Extern variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -299,9 +298,35 @@ void GPIO_Configuration(void)
     USB_DISCONNECT->BSRR = USB_DISCONNECT_PIN;
 
     /* Configure Potentiometer IO as analog input */
-    GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN_PIN;
+    GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN0_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
-    GPIO_Init(GPIO_IOAIN, &GPIO_InitStructure);
+    GPIO_Init(GPIO_IOAIN0, &GPIO_InitStructure);
+
+    /* Configure Potentiometer IO as analog input */
+    GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN1_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+    GPIO_Init(GPIO_IOAIN1, &GPIO_InitStructure);
+
+    /* Configure Potentiometer IO as analog input */
+    GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN2_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+    GPIO_Init(GPIO_IOAIN2, &GPIO_InitStructure);
+
+    /* Configure Potentiometer IO as analog input */
+    GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN3_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+    GPIO_Init(GPIO_IOAIN3, &GPIO_InitStructure);
+
+    /* Configure Potentiometer IO as analog input */
+    GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN4_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+    GPIO_Init(GPIO_IOAIN4, &GPIO_InitStructure);
+
+    /* Configure Potentiometer IO as analog input */
+    GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN5_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+    GPIO_Init(GPIO_IOAIN5, &GPIO_InitStructure);
+
 }
 
 /*******************************************************************************
@@ -357,13 +382,13 @@ void ADC_Configuration(void)
     /* DMA1 channel1 configuration ---------------------------------------------*/
     DMA_DeInit(DMA1_Channel1);
     DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_Address;
-    DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&ADC_ConvertedValueX;
+    DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&ADC_ConvertedValue;
     DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-    DMA_InitStructure.DMA_BufferSize = 1;
+    DMA_InitStructure.DMA_BufferSize = 6;
     DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-    DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;
-    DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-    DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+    DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+    DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
+    DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
     DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
     DMA_InitStructure.DMA_Priority = DMA_Priority_High;
     DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
@@ -381,11 +406,16 @@ void ADC_Configuration(void)
     ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
     ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
     ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-    ADC_InitStructure.ADC_NbrOfChannel = 1;
+    ADC_InitStructure.ADC_NbrOfChannel = 6;
     ADC_Init(ADC1, &ADC_InitStructure);
 
     /* ADC1 regular channel configuration */
-    ADC_RegularChannelConfig(ADC1, ADC_AIN_CHANNEL, 1, ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_1, 2, ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 3, ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 4, ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 5, ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 6, ADC_SampleTime_55Cycles5);
 
     /* Enable ADC1 DMA */
     ADC_DMACmd(ADC1, ENABLE);

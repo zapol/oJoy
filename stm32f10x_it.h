@@ -44,10 +44,11 @@ void EXTI9_5_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
 
 typedef struct __attribute__((__packed__)){
-    uint16_t buttons;
     int8_t x;
     int8_t y;
     int8_t z;
+    int8_t throttle1;
+    int8_t throttle2;
 } joyReport_t;
 
 #ifdef STM32F10X_CL
